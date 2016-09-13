@@ -2,8 +2,8 @@ import json
 
 
 def load_data(filepath):
-    with open(filepath, 'r') as file:
-        data = json.load(file)
+    with open(filepath, 'r') as raw_content:
+        data = json.load(raw_content)
     return data
 
 
@@ -31,11 +31,14 @@ def get_smallest_bar(data):
 
 def get_closest_bar(data, longitude, latitude):
     closest_bar = data[0]
-    lon, lat = data[0]['Cells']['geoData']['coordinates']
-    min_distance = ((lon - longitude) ** 2 + (lat - latitude) ** 2) ** 0.5
+    current_location = data[0]['Cells']['geoData']['coordinates']
+    current_longitude, current_latitude = current_location
+    min_distance = ((current_longitude - longitude) ** 2
+                    + (current_latitude - latitude) ** 2) ** 0.5
     for bar in data:
         lon, lat = bar['Cells']['geoData']['coordinates']
-        dist_to_bar = ((lon - longitude) ** 2 + (lat - latitude) ** 2) ** 0.5
+        dist_to_bar = ((current_longitude - longitude) ** 2
+                       + (current_latitude - latitude) ** 2) ** 0.5
         if dist_to_bar < min_distance:
             closest_bar = bar
     return closest_bar
