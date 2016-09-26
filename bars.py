@@ -8,46 +8,28 @@ def load_data(filepath):
 
 
 def get_biggest_bar(data):
-    max_seatscount = 0
-    huge_bar = None
-    for bar in data:
-        seatscount = bar['Cells']['SeatsCount']
-        if seatscount > max_seatscount:
-            max_seatscount = seatscount
-            huge_bar = bar
-    return huge_bar
+    return max(data, key=lambda bar: bar['Cells']['SeatsCount'])
 
 
 def get_smallest_bar(data):
-    min_seatscount = data[0]['Cells']['SeatsCount']
-    small_bar = None
-    for bar in data:
-        seatscount = bar['Cells']['SeatsCount']
-        if seatscount < min_seatscount:
-            min_seatscount = seatscount
-            small_bar = bar
-    return small_bar
+    return min(data, key=lambda bar: bar['Cells']['SeatsCount'])
+
+
+def get_distance(bar, longitude, latitude):
+    current_location = bar['Cells']['geoData']['coordinates']
+    current_longitude, current_latitude = current_location
+    return ((current_longitude - longitude) ** 2 +
+            (current_latitude - latitude) ** 2) ** 0.5
 
 
 def get_closest_bar(data, longitude, latitude):
-    closest_bar = data[0]
-    current_location = data[0]['Cells']['geoData']['coordinates']
-    current_longitude, current_latitude = current_location
-    min_distance = ((current_longitude - longitude) ** 2
-                    + (current_latitude - latitude) ** 2) ** 0.5
-    for bar in data:
-        lon, lat = bar['Cells']['geoData']['coordinates']
-        dist_to_bar = ((current_longitude - longitude) ** 2
-                       + (current_latitude - latitude) ** 2) ** 0.5
-        if dist_to_bar < min_distance:
-            closest_bar = bar
-    return closest_bar
+    return min(data, key=lambda bar: get_distance(bar, longitude, latitude))
 
 
 if __name__ == '__main__':
     data = load_data('bars.json')
-    print(get_biggest_bar(data))
-    print(get_smallest_bar(data))
+    print("The biggest bar is: ", get_biggest_bar(data))
+    print("The smallest bar is: ", get_smallest_bar(data))
     longitude = float(input('Enter longitude: '))
     latitude = float(input('Enter latitude: '))
-    print(get_closest_bar(data, longitude, latitude))
+    print("The closest bar is: ", get_closest_bar(data, longitude, latitude))
